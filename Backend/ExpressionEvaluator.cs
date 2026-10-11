@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection.Metadata;
+﻿using System.Globalization;
 
 namespace Backend;
 
@@ -15,10 +14,11 @@ public static class ExpressionEvaluator
         {
             if (IsOperator(item))
             {
+                posfix += ' '; // separa los números
                 if (item == ')')
                 {
                     var ope = stack.Pop();
-                    while(ope != '(')
+                    while (ope != '(')
                     {
                         posfix += ope;
                         ope = stack.Pop();
@@ -26,22 +26,11 @@ public static class ExpressionEvaluator
                 }
                 else
                 {
-                    if (stack.Count == 0)
+                    while (stack.Count > 0 && PriorityInfix(item) <= PriorityStack(stack.Peek()))
                     {
-                        stack.Push(item);
+                        posfix += stack.Pop();
                     }
-                    else
-                    {
-                        if (PriorityInfix(item) > PriorityStack(stack.Peek()))
-                        {
-                            stack.Push(item);
-                        }
-                        else
-                        {
-                            posfix += stack.Pop();
-                            stack.Push(item);
-                        }
-                    }
+                    stack.Push(item);
                 }
             }
             else
@@ -83,17 +72,26 @@ public static class ExpressionEvaluator
     private static double EvalutePostfix(string postfix)
     {
         var stack = new Stack<double>();
+        var number = string.Empty;
         foreach (var item in postfix)
         {
+            if (char.IsDigit(item) || item == '.')
+            {
+                number += item;
+                continue;
+            }
+
+            if (number != string.Empty)
+            {
+                stack.Push(double.Parse(number, CultureInfo.InvariantCulture));
+                number = string.Empty;
+            }
+
             if (IsOperator(item))
             {
                 var ope2 = stack.Pop();
                 var ope1 = stack.Pop();
                 stack.Push(Calculate(ope1, ope2, item));
-            }
-            else
-            {
-                stack.Push(char.GetNumericValue(item));
             }
         }
         return stack.Pop();

@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Frontend.Console": {
+      "commandName": "Project",
+      "jsWebView2Debugging": false,
+      "sqlDebugging": false,
+      "hotReloadEnabled": true,
+      "debugEngines": "managed",
+      "remoteDebugEnabled": false
+    }
+  }
+}
